@@ -1,17 +1,25 @@
 import { MySubTitle } from "./ui/MySubTitle"
 import { MyTitle } from "./ui/MyTitle"
-import { useState } from "react"
+import { useCallback, useState } from "react"
 
 export const MemoHook = () => {
   const [title, setTitle] = useState('Hola')
   const [subTitle, setSubTitle] = useState('Mundo')
+
+  // const handleMyAPICall = () => {
+  //   console.log('llamar a mi API')
+  // }
+
+  const handleMyAPICall = useCallback(() => {
+    console.log('llamar a mi API -', subTitle)
+  }, [subTitle])
 
   return (
     <div className="bg-gradient flex flex-col gap-4">
       <h1 className="text-2xl fonr-thin text-white">MemoApp</h1>
 
       <MyTitle title={title} />
-      <MySubTitle subtitle={subTitle} />
+      <MySubTitle subtitle={subTitle} callMyAPI={handleMyAPICall} />
 
       <button className="bg-blue-500 text-white px-4 py-2 rounded-md cursor-pointer"
         onClick={() => setTitle('Hello, ' + new Date().getTime())}
