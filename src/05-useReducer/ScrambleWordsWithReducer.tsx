@@ -1,14 +1,10 @@
-// ! Importante:
-// Es necesario componentes de Shadcn/ui
-// https://ui.shadcn.com/docs/installation/vite
-
-import React, { useReducer } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { SkipForward, Play } from 'lucide-react';
 import confetti from 'canvas-confetti'
-import { getInicialState, scrambleWordReducer, type ScrambleWordState } from './reducer/scrambleWordReducer';
+import { getInicialState, scrambleWordReducer } from './reducer/scrambleWordReducer';
 
 
 export const ScrambleWordsWithReducer = () => {
@@ -30,72 +26,34 @@ export const ScrambleWordsWithReducer = () => {
   } = state
 
 
-  // const [words, setWords] = useState(shuffleArray(GAME_WORDS));
+  useEffect(() => {
+    if (points === 0) return
+    confetti({
+      particleCount: 100,
+      spread: 120,
+      origin: { y: 0.6 },
+    })
 
-  // const [currentWord, setCurrentWord] = useState(words[0]);
-  // const [scrambledWord, setScrambledWord] = useState(scrambleWord(currentWord));
-  // const [guess, setGuess] = useState('');
-  // const [points, setPoints] = useState(0);
-  // const [errorCounter, setErrorCounter] = useState(0);
-  // const [maxAllowErrors, setMaxAllowErrors] = useState(3);
-
-  // const [skipCounter, setSkipCounter] = useState(0);
-  // const [maxSkips, setMaxSkips] = useState(3);
-
-  // const [isGameOver, setIsGameOver] = useState(false);
-
-
+  }, [points])
 
 
   const handleGuessSubmit = (e: React.FormEvent) => {
     // Previene el refresh de la página
-    // e.preventDefault();
-    // // Implementar lógica de juego
-    // if (guess != currentWord) {
-    //   setErrorCounter(errorCounter + 1)
-    //   setGuess('')
-    //   if (errorCounter + 1 >= maxAllowErrors) {
-    //     setIsGameOver(true)
-    //   }
-    //   return
-    // }
-    // const newWords = words.slice(1)
-    // confetti({
-    //   particleCount: 100,
-    //   spread: 120,
-    //   origin: { y: 0.6 },
-    // })
-
-    // setPoints(points + 1)
-    // setGuess('')
-    // setWords(newWords)
-    // setCurrentWord(newWords[0])
-    // setScrambledWord(scrambleWord(newWords[0]))
+    e.preventDefault();
+    dispatch({
+      type: 'CHECK_ANSWER',
+    })
   };
 
   const handleSkip = () => {
-    // if (skipCounter >= maxSkips) return
-
-    // const updatedWords = words.slice(1)
-
-    // setSkipCounter(skipCounter + 1)
-    // setWords(shuffleArray(updatedWords))
-    // setCurrentWord(updatedWords[0])
-    // setScrambledWord(scrambleWord(updatedWords[0]))
-    // setGuess('')
+    dispatch({ type: 'SKIP_WORD' })
   };
 
   const handlePlayAgain = () => {
-    // const newArray = shuffleArray(GAME_WORDS)
+    dispatch({
+      type: 'NEW_GAME', payload: getInicialState()
+    })
 
-    // setErrorCounter(0)
-    // setSkipCounter(0)
-    // setPoints(0)
-    // setIsGameOver(false)
-    // setWords(newArray)
-    // setCurrentWord(newArray[0])
-    // setScrambledWord(scrambleWord(newArray[0]))
-    // setGuess('')
   };
 
   //! Si ya no hay palabras para jugar, se muestra el mensaje de fin de juego
@@ -176,10 +134,11 @@ export const ScrambleWordsWithReducer = () => {
                     id="guess"
                     type="text"
                     value={guess}
-                    onChange={(e) =>
-                      // setGuess(e.target.value.toUpperCase().trim())
-                      console.log(e.target.value)
-                    }
+                    onChange={(e) => {
+                      dispatch({
+                        type: 'SET_GUESS', payload: e.target.value,
+                      })
+                    }}
                     placeholder="Ingresa tu palabra..."
                     className="text-center text-lg font-semibold h-12 border-2 border-indigo-200 focus:border-indigo-500 transition-colors"
                     maxLength={scrambledWord.length}
